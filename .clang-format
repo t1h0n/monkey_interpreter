@@ -1,0 +1,34 @@
+BasedOnStyle:  Google
+
+Language:        Cpp
+AccessModifierOffset: -4 
+IndentWidth: 4
+AllowShortFunctionsOnASingleLine : true
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlignTrailingComments: true
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Left
+ReflowComments: true
+BinPackParameters: false
+BreakBeforeBinaryOperators: true
+BreakBeforeBraces: Allman
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializersBeforeComma: true
+ColumnLimit:     0
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+DerivePointerBinding: false
+IndentCaseLabels : false
+SortUsingDeclarations: false
+SpacesInSquareBrackets: false
+Standard:        c++17
+# IndentPPDirectives: BeforeHash
+SeparateDefinitionBlocks: Always
+# include
+IncludeBlocks: Regroup 
+IncludeCategories:
+  - Regex: '".*"'
+    Priority: 1
+  - Regex: '<.*>'
+    Priority: 2
+SortIncludes: true

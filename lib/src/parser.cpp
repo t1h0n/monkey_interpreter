@@ -1,5 +1,7 @@
 #include "parser.hpp"
 
+#include "trace.hpp"
+
 const std::unordered_map<TokenType, Precedence> Parser::PRECEDENCE_ORDER{
     {TokenType::EQ,       Precedence::EQUALS     },
     {TokenType::NOT_EQ,   Precedence::EQUALS     },
@@ -12,46 +14,6 @@ const std::unordered_map<TokenType, Precedence> Parser::PRECEDENCE_ORDER{
     {TokenType::LPAREN,   Precedence::CALL       },
     {TokenType::LBRACKET, Precedence::INDEX      },
 };
-
-#if 0
-#define TRACE() const auto MACRO_trace_var_tmp_ = trace(__func__)
-
-namespace
-{
-class RaiiWrapper
-{
-public:
-    RaiiWrapper(const std::function<void()>& on_scope_exit)
-        : m_on_scope_exit{on_scope_exit}
-    {
-    }
-
-    ~RaiiWrapper()
-    {
-        if (m_on_scope_exit)
-        {
-            m_on_scope_exit();
-        }
-    }
-
-private:
-    std::function<void()> m_on_scope_exit;
-};
-
-auto trace(std::string_view s)
-{
-    static int counter = 0;
-    fmt::println("{}BEGIN {}", std::string(counter * 4, ' '), s);
-    ++counter;
-    return RaiiWrapper([s]()
-                       {
-                        --counter;
-                        fmt::println("{}END {}", std::string(counter * 4, ' '), s); });
-}
-}  // namespace
-#else
-#define TRACE() void(0)
-#endif
 
 Parser::Parser(std::unique_ptr<Lexer>&& lexer)
     : m_lexer(std::move(lexer))
@@ -87,6 +49,7 @@ Parser::Parser(std::unique_ptr<Lexer>&& lexer)
 
 auto Parser::parse_program() -> std::unique_ptr<Program>
 {
+    TRACE();
     auto program = std::make_unique<Program>();
     while (m_curr.type != TokenType::EOFILE)
     {
@@ -118,6 +81,7 @@ void Parser::next_token()
 
 auto Parser::parse_statement() -> std::unique_ptr<Statement>
 {
+    TRACE();
     switch (m_curr.type)
     {
     case TokenType::LET:
@@ -366,6 +330,7 @@ auto Parser::parse_array() -> std::unique_ptr<ArrayLiteral>
 
 auto Parser::parse_hash() -> std::unique_ptr<HashLiteral>
 {
+    TRACE();
     auto hash_lit = std::make_unique<HashLiteral>();
     while (m_next.type != TokenType::RBRACE)
     {

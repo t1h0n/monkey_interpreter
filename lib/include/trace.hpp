@@ -1,0 +1,40 @@
+#pragma once
+#if 0
+#define TRACE() const auto MACRO_trace_var_tmp_ = trace(__func__)
+
+namespace
+{
+class RaiiWrapper
+{
+public:
+    RaiiWrapper(const std::function<void()>& on_scope_exit)
+        : m_on_scope_exit{on_scope_exit}
+    {
+    }
+
+    ~RaiiWrapper()
+    {
+        if (m_on_scope_exit)
+        {
+            m_on_scope_exit();
+        }
+    }
+
+private:
+    std::function<void()> m_on_scope_exit;
+};
+
+auto trace(std::string_view s)
+{
+    static int counter = 0;
+    fmt::println("{}BEGIN {}", std::string(counter * 4, ' '), s);
+    ++counter;
+    return RaiiWrapper([s]()
+                       {
+                        --counter;
+                        fmt::println("{}END {}", std::string(counter * 4, ' '), s); });
+}
+}  // namespace
+#else
+#define TRACE() void(0)
+#endif

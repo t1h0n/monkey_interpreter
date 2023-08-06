@@ -42,6 +42,19 @@ TEST(Lexer, String)
     });
 }
 
+TEST(Lexer, While)
+{
+    validate_lexer("while(true){}", {
+                                        {TokenType::WHILE,  "while"},
+                                        {TokenType::LPAREN, "("    },
+                                        {TokenType::TRUE,   "true" },
+                                        {TokenType::RPAREN, ")"    },
+                                        {TokenType::LBRACE, "{"    },
+                                        {TokenType::RBRACE, "}"    },
+                                        {TokenType::EOFILE, ""     }
+    });
+}
+
 TEST(Lexer, Array)
 {
     validate_lexer("[1, 2]", {

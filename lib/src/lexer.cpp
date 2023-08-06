@@ -2,6 +2,8 @@
 
 #include <array>
 
+using namespace std::literals;
+
 Lexer::Lexer(std::string_view input)
     : m_input{input}
     , m_pos{0}
@@ -226,14 +228,15 @@ bool Lexer::is_letter(char ch)
 
 TokenType Lexer::lookup_ident(std::string_view ident) const
 {
-    static constexpr auto TOKENS = std::array<std::pair<std::string_view, TokenType>, 7>{
-        std::make_pair("fn", TokenType::FUNCTION),
-        std::make_pair("let", TokenType::LET),
-        std::make_pair("true", TokenType::TRUE),
-        std::make_pair("false", TokenType::FALSE),
-        std::make_pair("if", TokenType::IF),
-        std::make_pair("else", TokenType::ELSE),
-        std::make_pair("return", TokenType::RETURN),
+    static constexpr auto TOKENS = std::array{
+        std::make_pair("fn"sv, TokenType::FUNCTION),
+        std::make_pair("let"sv, TokenType::LET),
+        std::make_pair("true"sv, TokenType::TRUE),
+        std::make_pair("false"sv, TokenType::FALSE),
+        std::make_pair("if"sv, TokenType::IF),
+        std::make_pair("else"sv, TokenType::ELSE),
+        std::make_pair("return"sv, TokenType::RETURN),
+        std::make_pair("while"sv, TokenType::WHILE),
     };
     for (const auto [tok_ident, tok_type] : TOKENS)
     {

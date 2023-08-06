@@ -25,6 +25,7 @@ enum class NodeType : std::uint8_t
     ArrayLiteral,
     IndexExpression,
     HashLiteral,
+    WhileStatement,
 };
 
 class Node
@@ -170,7 +171,6 @@ class IfExpression : public Expression
 {
 public:
     auto token_literal() -> std::string override;
-
     auto to_string() -> std::string override;
     auto get_type() -> NodeType override;
 
@@ -179,6 +179,19 @@ public:
     std::unique_ptr<Expression> m_condition;
     std::unique_ptr<BlockStatement> m_consequence;
     std::unique_ptr<BlockStatement> m_alternative;
+};
+
+class WhileStatement : public Statement
+{
+public:
+    auto token_literal() -> std::string override;
+    auto to_string() -> std::string override;
+    auto get_type() -> NodeType override;
+
+public:
+    Token m_token;
+    std::unique_ptr<Expression> m_condition;
+    std::unique_ptr<BlockStatement> m_loop_body;
 };
 
 class PrefixExpression : public Expression
@@ -214,7 +227,6 @@ class FnLiteral : public Expression
 {
 public:
     auto token_literal() -> std::string override;
-
     auto to_string() -> std::string override;
     auto get_type() -> NodeType override;
 

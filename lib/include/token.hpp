@@ -14,6 +14,7 @@ enum class TokenType : std::uint8_t
     // Identifiers + literals
     IDENT,
     INT,
+    STRING,
     // Operators
     ASSIGN,
     PLUS,
@@ -34,6 +35,7 @@ enum class TokenType : std::uint8_t
     RBRACE,
     LBRACKET,
     RBRACKET,
+    COLON,
     // Keywords
     FUNCTION,
     LET,
@@ -42,8 +44,7 @@ enum class TokenType : std::uint8_t
     IF,
     ELSE,
     RETURN,
-    STRING,
-    COLON,
+    WHILE,
 };
 
 struct Token

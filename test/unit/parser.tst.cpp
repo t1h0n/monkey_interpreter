@@ -290,6 +290,19 @@ TEST(Parser, ArrayLiteral)
     EXPECT_EQ("[parse, me, daddy]", program->to_string());
 }
 
+TEST(Parser, WhileStatement)
+{
+    const std::string input = "while(a){let a = false;}";
+    Parser parser(std::make_unique<Lexer>(input));
+    const auto program = parser.parse_program();
+    const auto& errors = parser.get_errors();
+    EXPECT_THAT(errors, IsEmpty());
+    ASSERT_THAT(program, NotNull());
+    EXPECT_EQ(program->m_statements.size(), 1);
+    const auto& node_val = dynamic_cast<WhileStatement&>(*program->m_statements[0]);
+    EXPECT_EQ(input, program->to_string());
+}
+
 TEST(Parser, HashLiteral)
 {
     const std::string input = R"({"one":1})";

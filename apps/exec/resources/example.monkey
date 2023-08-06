@@ -32,3 +32,10 @@ let mp = {"foo":"b" + "a" + "r", "thr" + "ee": 6 / 2, true : false};
 let mp_ = push(mp, false, sum(a));
 let mp_f = erase(mp, "foo");
 puts("mp before push:", mp, "mp after push:", mp_, "mp after erasing foo", mp_f);
+
+let i = 1;
+while(i < 4)
+{
+    puts("i is now:", i);
+    let i = i + 1; 
+}

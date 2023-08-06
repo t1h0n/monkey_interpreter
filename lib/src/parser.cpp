@@ -128,6 +128,10 @@ auto Parser::parse_statement() -> std::unique_ptr<Statement>
     {
         return parse_return_statement();
     }
+    case TokenType::WHILE:
+    {
+        return parse_while_statement();
+    }
     default:
         return parse_expression_statement();
     };
@@ -178,6 +182,30 @@ auto Parser::parse_return_statement() -> std::unique_ptr<ReturnStatement>
         next_token();
     }
     return return_statement;
+}
+
+auto Parser::parse_while_statement() -> std::unique_ptr<WhileStatement>
+{
+    TRACE();
+    auto while_statement = std::make_unique<WhileStatement>();
+    while_statement->m_token = m_curr;
+    if (!expect_peek(TokenType::LPAREN))
+    {
+        return nullptr;
+    }
+    next_token();
+    while_statement->m_condition = parse_expression(Precedence::LOWEST);
+    if (!expect_peek(TokenType::RPAREN) || !while_statement->m_condition)
+    {
+        return nullptr;
+    }
+    next_token();
+    while_statement->m_loop_body = parse_block_statement();
+    if (!while_statement->m_loop_body)
+    {
+        return nullptr;
+    }
+    return while_statement;
 }
 
 auto Parser::parse_expression_statement() -> std::unique_ptr<ExpressionStatement>

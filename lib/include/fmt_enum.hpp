@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <type_traits>
 
-
 template <typename T>
 struct ::fmt::formatter<T, char, std::enable_if_t<std::is_enum_v<T>>>
 {

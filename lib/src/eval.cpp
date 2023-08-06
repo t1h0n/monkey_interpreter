@@ -513,6 +513,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
             return val;
         }
         env->set_obj(nd->m_name->m_value, val);
+        return NIL;
     }
     else if (node_type == NodeType::FnLiteral)
     {
@@ -559,6 +560,29 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
             hash_obj->m_pairs[std::move(key_obj)] = std::move(val_obj);
         }
         return hash_obj;
+    }
+    else if (node_type == NodeType::WhileStatement)
+    {
+        auto* nd = static_cast<WhileStatement*>(node);
+        auto condition = eval(nd->m_condition.get(), env);
+        if (condition->get_type() == ObjectType::ERROR)
+        {
+            return condition;
+        }
+        while (is_truth(condition))
+        {
+            auto body = eval(nd->m_loop_body.get(), env);
+            if (body->get_type() == ObjectType::ERROR)
+            {
+                return body;
+            }
+            condition = eval(nd->m_condition.get(), env);
+            if (condition->get_type() == ObjectType::ERROR)
+            {
+                return condition;
+            }
+        }
+        return NIL;
     }
     else if (node_type == NodeType::CallExpression)
     {

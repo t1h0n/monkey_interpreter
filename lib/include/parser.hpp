@@ -35,6 +35,7 @@ private:
     auto parse_return_statement() -> std::unique_ptr<ReturnStatement>;
     auto parse_expression_statement() -> std::unique_ptr<ExpressionStatement>;
     auto parse_block_statement() -> std::unique_ptr<BlockStatement>;
+    auto parse_while_statement() -> std::unique_ptr<WhileStatement>;
 
     auto parse_expression(Precedence precedence) -> std::unique_ptr<Expression>;
     auto parse_prefix_expression() -> std::unique_ptr<PrefixExpression>;

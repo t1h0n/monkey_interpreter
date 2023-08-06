@@ -28,6 +28,11 @@ auto Program::to_string() -> std::string
     return out;
 }
 
+auto Program::get_type() -> NodeType
+{
+    return NodeType::Program;
+}
+
 auto LetStatement::token_literal() -> std::string
 {
     return m_token.literal;
@@ -36,6 +41,11 @@ auto LetStatement::token_literal() -> std::string
 auto LetStatement::to_string() -> std::string
 {
     return fmt::format("{} {} = {};", token_literal(), m_name->to_string(), m_value ? m_value->to_string() : "");
+}
+
+auto LetStatement::get_type() -> NodeType
+{
+    return NodeType::LetStatement;
 }
 
 auto Identifier::token_literal() -> std::string
@@ -48,6 +58,11 @@ auto Identifier::to_string() -> std::string
     return m_value;
 }
 
+auto Identifier::get_type() -> NodeType
+{
+    return NodeType::Identifier;
+}
+
 auto ReturnStatement::token_literal() -> std::string
 {
     return m_token.literal;
@@ -56,6 +71,11 @@ auto ReturnStatement::token_literal() -> std::string
 auto ReturnStatement::to_string() -> std::string
 {
     return fmt::format("{} = {};", token_literal(), m_return_value ? m_return_value->to_string() : "");
+}
+
+auto ReturnStatement::get_type() -> NodeType
+{
+    return NodeType::ReturnStatement;
 }
 
 auto BlockStatement::token_literal() -> std::string
@@ -69,6 +89,11 @@ auto BlockStatement::to_string() -> std::string
     return fmt::format("{}", fmt::join(m_statements | rv::transform([](const value_t& ptr)
                                                                     { return ptr->to_string(); }),
                                        ""));
+}
+
+auto BlockStatement::get_type() -> NodeType
+{
+    return NodeType::BlockStatement;
 }
 
 auto ExpressionStatement::token_literal() -> std::string
@@ -85,6 +110,11 @@ auto ExpressionStatement::to_string() -> std::string
     return m_expression->to_string();
 }
 
+auto ExpressionStatement::get_type() -> NodeType
+{
+    return NodeType::ExpressionStatement;
+}
+
 IntegerLiteral::IntegerLiteral(std::int64_t val)
     : m_value{val}
 {
@@ -98,6 +128,11 @@ auto IntegerLiteral::token_literal() -> std::string
 auto IntegerLiteral::to_string() -> std::string
 {
     return m_token.literal;
+}
+
+auto IntegerLiteral::get_type() -> NodeType
+{
+    return NodeType::IntegerLiteral;
 }
 
 StringLiteral::StringLiteral(std::string_view str)
@@ -130,6 +165,11 @@ auto BooleanLiteral::to_string() -> std::string
     return m_token.literal;
 }
 
+auto BooleanLiteral::get_type() -> NodeType
+{
+    return NodeType::BooleanLiteral;
+}
+
 auto IfExpression::token_literal() -> std::string
 {
     return m_token.literal;
@@ -145,6 +185,11 @@ auto IfExpression::to_string() -> std::string
     return if_str;
 }
 
+auto IfExpression::get_type() -> NodeType
+{
+    return NodeType::IfExpression;
+}
+
 auto PrefixExpression::token_literal() -> std::string
 {
     return m_token.literal;
@@ -155,6 +200,11 @@ auto PrefixExpression::to_string() -> std::string
     return fmt::format("({}{})", m_operator, m_right->to_string());
 }
 
+auto PrefixExpression::get_type() -> NodeType
+{
+    return NodeType::PrefixExpression;
+}
+
 auto InfixExpression::token_literal() -> std::string
 {
     return m_token.literal;
@@ -163,6 +213,11 @@ auto InfixExpression::token_literal() -> std::string
 auto InfixExpression::to_string() -> std::string
 {
     return fmt::format("({} {} {})", m_left->to_string(), m_operator, m_right->to_string());
+}
+
+auto InfixExpression::get_type() -> NodeType
+{
+    return NodeType::InfixExpression;
 }
 
 auto FnLiteral::token_literal() -> std::string
@@ -179,6 +234,11 @@ auto FnLiteral::to_string() -> std::string
                        m_body->to_string());
 }
 
+auto FnLiteral::get_type() -> NodeType
+{
+    return NodeType::FnLiteral;
+}
+
 auto CallExpression::token_literal() -> std::string
 {
     return m_token.literal;
@@ -190,6 +250,11 @@ auto CallExpression::to_string() -> std::string
     return fmt::format("{}({})", m_function->to_string(), fmt::join(m_arguments | rv::transform([](const value_t& ptr)
                                                                                                 { return ptr->to_string(); }),
                                                                     ", "));
+}
+
+auto CallExpression::get_type() -> NodeType
+{
+    return NodeType::CallExpression;
 }
 
 auto ArrayLiteral::token_literal() -> std::string
@@ -225,74 +290,19 @@ auto IndexExpression::get_type() -> NodeType
     return NodeType::IndexExpression;
 }
 
-auto Program::get_type() -> NodeType
-{
-    return NodeType::Program;
-}
-
-auto Identifier::get_type() -> NodeType
-{
-    return NodeType::Identifier;
-}
-
-auto LetStatement::get_type() -> NodeType
-{
-    return NodeType::LetStatement;
-}
-
-auto ReturnStatement::get_type() -> NodeType
-{
-    return NodeType::ReturnStatement;
-}
-
-auto BlockStatement::get_type() -> NodeType
-{
-    return NodeType::BlockStatement;
-}
-
-auto ExpressionStatement::get_type() -> NodeType
-{
-    return NodeType::ExpressionStatement;
-}
-
-auto IntegerLiteral::get_type() -> NodeType
-{
-    return NodeType::IntegerLiteral;
-}
-
-auto BooleanLiteral::get_type() -> NodeType
-{
-    return NodeType::BooleanLiteral;
-}
-
-auto IfExpression::get_type() -> NodeType
-{
-    return NodeType::IfExpression;
-}
-
-auto PrefixExpression::get_type() -> NodeType
-{
-    return NodeType::PrefixExpression;
-}
-
-auto InfixExpression::get_type() -> NodeType
-{
-    return NodeType::InfixExpression;
-}
-
-auto FnLiteral::get_type() -> NodeType
-{
-    return NodeType::FnLiteral;
-}
-
-auto CallExpression::get_type() -> NodeType
-{
-    return NodeType::CallExpression;
-}
-
-auto HashLiteral::token_literal() -> std::string
+auto WhileStatement::token_literal() -> std::string
 {
     return m_token.literal;
+}
+
+auto WhileStatement::to_string() -> std::string
+{
+    return fmt::format("while({}){{{}}}", m_condition->to_string(), m_loop_body->to_string());
+}
+
+auto WhileStatement::get_type() -> NodeType
+{
+    return NodeType::WhileStatement;
 }
 
 auto HashLiteral::to_string() -> std::string
@@ -306,4 +316,9 @@ auto HashLiteral::to_string() -> std::string
 auto HashLiteral::get_type() -> NodeType
 {
     return NodeType::HashLiteral;
+}
+
+auto HashLiteral::token_literal() -> std::string
+{
+    return m_token.literal;
 }

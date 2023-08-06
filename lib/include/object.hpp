@@ -15,7 +15,7 @@ enum class ObjectType
 {
     INTEGER,
     BOOLEAN,
-    NULL_OBJ,
+    NIL,
     RETURN,
     ERROR,
     FUNCTION,
@@ -205,7 +205,7 @@ public:
     Context() = default;
     Context(const std::shared_ptr<Context>& parent_env);
     auto get_obj(std::string_view name) -> std::shared_ptr<Object>;
-    auto set_obj(std::string_view name, const std::shared_ptr<Object>& obj) -> std::shared_ptr<Object>;
+    void set_obj(std::string_view name, const std::shared_ptr<Object>& obj);
 
 private:
     ObjectsMap m_objects;

@@ -55,7 +55,7 @@ auto StringObj::inspect() -> std::string
 
 auto NullObj::get_type() -> ObjectType
 {
-    return ObjectType::NULL_OBJ;
+    return ObjectType::NIL;
 }
 
 auto NullObj::inspect() -> std::string
@@ -191,8 +191,7 @@ auto Context::get_obj(std::string_view name) -> std::shared_ptr<Object>
     return nullptr;
 }
 
-auto Context::set_obj(std::string_view name, const std::shared_ptr<Object>& obj) -> std::shared_ptr<Object>
+void Context::set_obj(std::string_view name, const std::shared_ptr<Object>& obj)
 {
-    const auto [it, _] = m_objects.emplace(name, obj);
-    return it->second;
+    m_objects[std::string(name)] = obj;
 }

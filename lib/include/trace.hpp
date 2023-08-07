@@ -1,5 +1,8 @@
 #pragma once
-#if 0
+#include <fmt/core.h>
+#include <functional>
+
+#if defined(ENABLE_PARSE_TRACING)
 #define TRACE() const auto MACRO_trace_var_tmp_ = trace(__func__)
 
 namespace
@@ -24,7 +27,7 @@ private:
     std::function<void()> m_on_scope_exit;
 };
 
-auto trace(std::string_view s)
+inline auto trace(std::string_view s)
 {
     static int counter = 0;
     fmt::println("{}BEGIN {}", std::string(counter * 4, ' '), s);

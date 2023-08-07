@@ -6,6 +6,8 @@ find_package(GTest REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(range-v3 REQUIRED)
 
+option(${PROJECT_NAME}_ENABLE_PARSE_TRACING
+       "Specify if parsing tracing should be active" OFF)
 add_subdirectory(dep/fs)
 
 add_subdirectory(lib)

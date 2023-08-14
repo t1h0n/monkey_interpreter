@@ -5,8 +5,6 @@
 #if defined(ENABLE_PARSE_TRACING)
 #define TRACE() const auto MACRO_trace_var_tmp_ = trace(__func__)
 
-namespace
-{
 class RaiiWrapper
 {
 public:
@@ -37,7 +35,6 @@ inline auto trace(std::string_view s)
                         --counter;
                         fmt::println("{}END {}", std::string(counter * 4, ' '), s); });
 }
-}  // namespace
 #else
 #define TRACE() void(0)
 #endif

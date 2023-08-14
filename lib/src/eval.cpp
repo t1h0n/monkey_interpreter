@@ -8,6 +8,10 @@
 namespace rv = ::ranges::views;
 using namespace std::literals;
 
+const auto TRUE = std::make_shared<BooleanObj>(true);
+const auto FALSE = std::make_shared<BooleanObj>(false);
+const auto NIL = std::make_shared<NullObj>();
+
 namespace
 {
 auto eval_len(const std::vector<std::shared_ptr<Object>>& args) -> std::shared_ptr<Object>

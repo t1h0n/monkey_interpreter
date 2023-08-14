@@ -223,7 +223,7 @@ char Lexer::peek_char()
 
 bool Lexer::is_letter(char ch)
 {
-    return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_';
+    return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ch == '_';
 }
 
 TokenType Lexer::lookup_ident(std::string_view ident) const

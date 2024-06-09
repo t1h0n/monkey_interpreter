@@ -1,0 +1,7 @@
+tab_size: 4
+
+keyword_case: "upper"
+command_case: "canonical"
+line_ending: "unix"
+enable_markup: False
+line_width: 120

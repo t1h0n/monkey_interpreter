@@ -8,7 +8,6 @@ using namespace ::testing;
 
 namespace
 {
-
 void validate_lexer(std::string_view input, std::vector<mlang::Token> expected_tokens)
 {
     mlang::Lexer lexer(input);

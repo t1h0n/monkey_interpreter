@@ -1,11 +1,12 @@
 #include "mlang/parser.hpp"
+
 #include "mlang\raii_wrapper.hpp"
+
+#include <utility>
 
 #if defined(ENABLE_PARSE_TRACING)
 #define TRACE() const auto MACRO_trace_var_tmp_ = trace(__func__)
-#else
-#define TRACE() void(0)
-#endif
+
 namespace
 {
 inline auto trace(std::string_view s)
@@ -19,22 +20,12 @@ inline auto trace(std::string_view s)
                         fmt::println("{}END {}", std::string(counter * 4, ' '), s); });
 }
 }  // namespace
+#else
+#define TRACE() void(0)
+#endif
 
 namespace mlang
 {
-const std::unordered_map<TokenType, Precedence> Parser::PRECEDENCE_ORDER{
-    {TokenType::EQ,       Precedence::EQUALS     },
-    {TokenType::NOT_EQ,   Precedence::EQUALS     },
-    {TokenType::LT,       Precedence::LESSGREATER},
-    {TokenType::GT,       Precedence::LESSGREATER},
-    {TokenType::PLUS,     Precedence::SUM        },
-    {TokenType::MINUS,    Precedence::SUM        },
-    {TokenType::SLASH,    Precedence::PRODUCT    },
-    {TokenType::ASTERISK, Precedence::PRODUCT    },
-    {TokenType::LPAREN,   Precedence::CALL       },
-    {TokenType::LBRACKET, Precedence::INDEX      },
-};
-
 Parser::Parser(std::unique_ptr<ILexer>&& lexer)
     : m_lexer(std::move(lexer))
 {
@@ -533,7 +524,21 @@ auto Parser::parse_block_statement() -> std::unique_ptr<BlockStatement>
 
 auto Parser::get_precedence(TokenType type) -> Precedence
 {
-    const auto it = PRECEDENCE_ORDER.find(type);
+    static constexpr auto PRECEDENCE_ORDER = std::array{
+        std::make_pair(TokenType::EQ, Precedence::EQUALS),
+        std::make_pair(TokenType::NOT_EQ, Precedence::EQUALS),
+        std::make_pair(TokenType::LT, Precedence::LESSGREATER),
+        std::make_pair(TokenType::GT, Precedence::LESSGREATER),
+        std::make_pair(TokenType::PLUS, Precedence::SUM),
+        std::make_pair(TokenType::MINUS, Precedence::SUM),
+        std::make_pair(TokenType::SLASH, Precedence::PRODUCT),
+        std::make_pair(TokenType::ASTERISK, Precedence::PRODUCT),
+        std::make_pair(TokenType::LPAREN, Precedence::CALL),
+        std::make_pair(TokenType::LBRACKET, Precedence::INDEX),
+    };
+    using value_t = typename decltype(PRECEDENCE_ORDER)::value_type;
+    const auto it = std::find_if(std::begin(PRECEDENCE_ORDER), std::end(PRECEDENCE_ORDER), [type](const value_t& v) -> bool
+                                 { return type == v.first; });
     if (it == std::end(PRECEDENCE_ORDER))
     {
         return Precedence::LOWEST;

@@ -8,6 +8,8 @@
 #include <gtest/gtest.h>
 #include <vector>
 
+#define UNUSED(expr) static_cast<void>((expr))
+
 using namespace ::testing;
 using namespace ::std::literals;
 
@@ -226,8 +228,8 @@ TEST(Parser, IfStatement)
     EXPECT_THAT(errors, IsEmpty());
     ASSERT_THAT(program, NotNull());
     EXPECT_EQ(program->m_statements.size(), 1);
-    const auto& node_val = dynamic_cast<mlang::IfExpression&>(
-        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression);
+    EXPECT_NO_THROW(UNUSED(dynamic_cast<mlang::IfExpression&>(
+        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression)));
     EXPECT_EQ(input, program->to_string());
 }
 
@@ -240,8 +242,8 @@ TEST(Parser, FunctionLiteral)
     EXPECT_THAT(errors, IsEmpty());
     ASSERT_THAT(program, NotNull());
     EXPECT_EQ(program->m_statements.size(), 1);
-    const auto& node_val = dynamic_cast<mlang::FnLiteral&>(
-        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression);
+    EXPECT_NO_THROW(UNUSED(dynamic_cast<mlang::FnLiteral&>(
+        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression)));
     EXPECT_EQ("fn(x, y){(x + y)}", program->to_string());
 }
 
@@ -254,8 +256,8 @@ TEST(Parser, CallExpression)
     EXPECT_THAT(errors, IsEmpty());
     ASSERT_THAT(program, NotNull());
     EXPECT_EQ(program->m_statements.size(), 1);
-    const auto& node_val = dynamic_cast<mlang::CallExpression&>(
-        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression);
+    EXPECT_NO_THROW(UNUSED(dynamic_cast<mlang::CallExpression&>(
+        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression)));
     EXPECT_EQ("add(1, (2 * 3), (4 + 5))", program->to_string());
 }
 
@@ -268,8 +270,8 @@ TEST(Parser, StringLiteral)
     EXPECT_THAT(errors, IsEmpty());
     ASSERT_THAT(program, NotNull());
     EXPECT_EQ(program->m_statements.size(), 1);
-    const auto& node_val = dynamic_cast<mlang::StringLiteral&>(
-        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression);
+    EXPECT_NO_THROW(UNUSED(dynamic_cast<mlang::StringLiteral&>(
+        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression)));
     EXPECT_EQ(input, program->to_string());
 }
 
@@ -282,8 +284,8 @@ TEST(Parser, ArrayLiteral)
     EXPECT_THAT(errors, IsEmpty());
     ASSERT_THAT(program, NotNull());
     EXPECT_EQ(program->m_statements.size(), 1);
-    const auto& node_val = dynamic_cast<mlang::ArrayLiteral&>(
-        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression);
+    EXPECT_NO_THROW(UNUSED(dynamic_cast<mlang::ArrayLiteral&>(
+        *dynamic_cast<mlang::ExpressionStatement&>(*program->m_statements[0]).m_expression)));
     EXPECT_EQ("[parse, me, daddy]", program->to_string());
 }
 
@@ -296,7 +298,7 @@ TEST(Parser, WhileStatement)
     EXPECT_THAT(errors, IsEmpty());
     ASSERT_THAT(program, NotNull());
     EXPECT_EQ(program->m_statements.size(), 1);
-    const auto& node_val = dynamic_cast<mlang::WhileStatement&>(*program->m_statements[0]);
+    EXPECT_NO_THROW(UNUSED(dynamic_cast<mlang::WhileStatement&>(*program->m_statements[0])));
     EXPECT_EQ(input, program->to_string());
 }
 

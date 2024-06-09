@@ -16,8 +16,8 @@ private:
     auto read_string() -> std::string;
     void skip_whitespaces();
     void read_char();
-    char peek_char();
-    bool is_letter(char ch);
+    auto peek_char() -> char;
+    auto is_letter(char ch) -> bool;
     auto lookup_ident(std::string_view ident) const -> TokenType;
 
 private:
@@ -26,4 +26,4 @@ private:
     size_t m_read_pos;
     char m_ch;
 };
-}
+}  // namespace mlang

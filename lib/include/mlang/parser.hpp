@@ -70,7 +70,5 @@ private:
     std::unordered_map<TokenType, PrefixParseFn> m_prefix_parse_fns;
     std::unordered_map<TokenType, InfixParseFn> m_infix_parse_fns;
     std::vector<std::string> m_errors;
-
-    static const std::unordered_map<TokenType, Precedence> PRECEDENCE_ORDER;
 };
 }  // namespace mlang

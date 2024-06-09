@@ -216,7 +216,7 @@ void Lexer::read_char()
     m_read_pos += 1;
 }
 
-char Lexer::peek_char()
+auto Lexer::peek_char() -> char
 {
     if (m_read_pos >= m_input.size())
     {
@@ -225,7 +225,7 @@ char Lexer::peek_char()
     return m_input[m_read_pos];
 }
 
-bool Lexer::is_letter(char ch)
+auto Lexer::is_letter(char ch) -> bool
 {
     return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ch == '_';
 }

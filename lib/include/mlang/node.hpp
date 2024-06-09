@@ -1,11 +1,13 @@
 #pragma once
-#include "token.hpp"
+#include "mlang/token.hpp"
 
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
 
+namespace mlang
+{
 enum class NodeType : std::uint8_t
 {
     Program,
@@ -292,3 +294,4 @@ public:
     Token m_token;
     ExprHashMap m_pairs;
 };
+}  // namespace mlang

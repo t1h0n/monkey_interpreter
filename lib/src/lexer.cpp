@@ -1,8 +1,12 @@
-#include "lexer.hpp"
+#include "mlang/lexer.hpp"
 
 #include <array>
 
 using namespace std::literals;
+
+namespace mlang
+{
+ILexer::~ILexer() = default;
 
 Lexer::Lexer(std::string_view input)
     : m_input{input}
@@ -247,3 +251,4 @@ TokenType Lexer::lookup_ident(std::string_view ident) const
     }
     return TokenType::IDENT;
 }
+}  // namespace mlang

@@ -1,12 +1,14 @@
 #pragma once
 
-#include "fmt/core.h"
-#include "fmt_enum.hpp"
+#include "mlang/fmt_enum.hpp"
 
 #include <cstdint>
+#include <fmt/core.h>
 #include <stdexcept>
 #include <string>
 
+namespace mlang
+{
 enum class TokenType : std::uint8_t
 {
     ILLEGAL,
@@ -63,8 +65,10 @@ inline bool operator!=(const Token& lhs, const Token& rhs)
     return !(lhs == rhs);
 }
 
+}  // namespace mlang
+
 template <>
-struct ::fmt::formatter<Token>
+struct ::fmt::formatter<::mlang::Token>
 {
     constexpr auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
@@ -77,7 +81,7 @@ struct ::fmt::formatter<Token>
     }
 
     template <typename FormatContext>
-    auto format(const Token& tok, FormatContext& ctx)
+    auto format(const mlang::Token& tok, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "Token{{{}, '{}'}}", tok.type, tok.literal);
     }

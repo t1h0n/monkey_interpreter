@@ -1,50 +1,53 @@
 
 
-#include "eval.hpp"
+#include "mlang/eval.hpp"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "object.hpp"
-#include "parser.hpp"
+#include "mlang/object.hpp"
+#include "mlang/parser.hpp"
+#include "mlang/token.hpp"
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <utility>
 
 using namespace ::testing;
 
 namespace
 {
 template <typename OutObj, typename Out, typename = std::enable_if_t<std::is_convertible_v<Out, decltype(OutObj::m_value)>>>
-void test_generic_expr(const std::string& input, const Out& expected)
+void test_generic_expr(const std::string& input, const Out& expected, mlang::ObjectType out_type)
 {
-    Parser p(std::make_unique<Lexer>(input));
+    mlang::Parser p(std::make_unique<mlang::Lexer>(input));
     auto program = p.parse_program();
     const auto& errors = p.get_errors();
     EXPECT_THAT(errors, IsEmpty()) << input;
     ASSERT_THAT(program, NotNull()) << input;
 
-    auto env = std::make_shared<Context>();
+    auto env = std::make_shared<mlang::Context>();
     auto res = eval(program.get(), env);
     ASSERT_THAT(res, NotNull()) << input;
-    ASSERT_EQ(typeid(*res), typeid(OutObj)) << res->inspect();
+    ASSERT_EQ(res->get_type(), out_type) << res->inspect();
     auto* obj = static_cast<OutObj*>(res.get());
     EXPECT_EQ(obj->m_value, expected) << input;
 }
 
 void test_generic_expr_with_nil(const std::string& input)
 {
-    Parser p(std::make_unique<Lexer>(input));
+    mlang::Parser p(std::make_unique<mlang::Lexer>(input));
     auto program = p.parse_program();
     const auto& errors = p.get_errors();
     EXPECT_THAT(errors, IsEmpty()) << input;
     ASSERT_THAT(program, NotNull()) << input;
 
-    auto env = std::make_shared<Context>();
+    auto env = std::make_shared<mlang::Context>();
     auto res = eval(program.get(), env);
     ASSERT_THAT(res, NotNull()) << input;
-    EXPECT_EQ(typeid(NullObj), typeid(*res)) << input;
+    EXPECT_EQ(mlang::detail::NIL, res) << input;
 }
 
 void test_error(const std::string& input, const std::string& expected_err)
 {
-    Parser p(std::make_unique<Lexer>(input));
+    mlang::Parser p(std::make_unique<mlang::Lexer>(input));
     auto program = p.parse_program();
     const auto& errors = p.get_errors();
     EXPECT_THAT(errors, IsEmpty()) << input << "\n"
@@ -52,13 +55,13 @@ void test_error(const std::string& input, const std::string& expected_err)
     ASSERT_THAT(program, NotNull()) << input << "\n"
                                     << expected_err;
 
-    auto env = std::make_shared<Context>();
+    auto env = std::make_shared<mlang::Context>();
     auto res = eval(program.get(), env);
     ASSERT_THAT(res, NotNull()) << input << "\n"
                                 << expected_err;
-    ASSERT_EQ(typeid(*res), typeid(ErrorObj)) << input << "\n"
-                                              << expected_err;
-    auto* obj = static_cast<ErrorObj*>(res.get());
+    ASSERT_EQ(res->get_type(), mlang::ObjectType::ERROR) << input << "\n"
+                                                         << expected_err;
+    auto* obj = static_cast<mlang::ErrorObj*>(res.get());
     EXPECT_EQ(obj->m_what, expected_err) << input;
 }
 }  // namespace
@@ -71,7 +74,7 @@ TEST(eval, IntegerObj)
              {"10", 10}
     })
     {
-        test_generic_expr<IntegerObj>(input, expected);
+        test_generic_expr<mlang::IntegerObj>(input, expected, mlang::ObjectType::INTEGER);
     }
 }
 
@@ -83,7 +86,7 @@ TEST(eval, BooleanObj)
              {"false", false},
     })
     {
-        test_generic_expr<BooleanObj>(input, expected);
+        test_generic_expr<mlang::BooleanObj>(input, expected, mlang::ObjectType::BOOLEAN);
     }
 }
 
@@ -99,7 +102,7 @@ TEST(eval, PrefixOperatorBool)
              {"!!5",     true },
     })
     {
-        test_generic_expr<BooleanObj>(input, expected);
+        test_generic_expr<mlang::BooleanObj>(input, expected, mlang::ObjectType::BOOLEAN);
     }
 }
 
@@ -113,7 +116,7 @@ TEST(eval, PrefixOperatorInt)
              {"-10", -10},
     })
     {
-        test_generic_expr<IntegerObj>(input, expected);
+        test_generic_expr<mlang::IntegerObj>(input, expected, mlang::ObjectType::INTEGER);
     }
 }
 
@@ -139,7 +142,7 @@ TEST(eval, EvalIntegerExpression)
              {"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50 },
     })
     {
-        test_generic_expr<IntegerObj>(input, expected);
+        test_generic_expr<mlang::IntegerObj>(input, expected, mlang::ObjectType::INTEGER);
     }
 }
 
@@ -169,7 +172,7 @@ TEST(eval, EvalBooleanExpression)
              {"1 != 2",           true }
     })
     {
-        test_generic_expr<BooleanObj>(input, expected);
+        test_generic_expr<mlang::BooleanObj>(input, expected, mlang::ObjectType::BOOLEAN);
     }
 }
 
@@ -185,7 +188,7 @@ TEST(eval, IfElseExpressions)
              {"if (10 > 1) {if (10 > 1) {return 10;}return 1;}", 10},
     })
     {
-        test_generic_expr<IntegerObj>(input, expected);
+        test_generic_expr<mlang::IntegerObj>(input, expected, mlang::ObjectType::INTEGER);
     }
     for (const auto& input : {"if (1 > 2) { 10 }", "if (false) { 10 }"})
     {
@@ -203,7 +206,7 @@ TEST(eval, ReturnStatements)
              {"9; return 2 * 5; 9;", 10},
     })
     {
-        test_generic_expr<IntegerObj>(input, expected);
+        test_generic_expr<mlang::IntegerObj>(input, expected, mlang::ObjectType::INTEGER);
     }
 }
 
@@ -235,7 +238,7 @@ TEST(eval, LetStatement)
              {"let a = 5; let b = a; let c = a + b + 5; c;", 15},
     })
     {
-        test_generic_expr<IntegerObj>(input, val);
+        test_generic_expr<mlang::IntegerObj>(input, val, mlang::ObjectType::INTEGER);
     }
 }
 
@@ -249,7 +252,7 @@ TEST(eval, FunctionObj)
              {"let a = 5; let b = a; let c = a + b + 5; c;", 15},
     })
     {
-        test_generic_expr<IntegerObj>(input, val);
+        test_generic_expr<mlang::IntegerObj>(input, val, mlang::ObjectType::INTEGER);
     }
 }
 
@@ -265,7 +268,7 @@ TEST(eval, FnCall)
              {"fn(x) { x; }(5)",                                       5 },
     })
     {
-        test_generic_expr<IntegerObj>(input, expected);
+        test_generic_expr<mlang::IntegerObj>(input, expected, mlang::ObjectType::INTEGER);
     }
 }
 
@@ -278,7 +281,7 @@ TEST(eval, FnCallClosure)
         let addTwo = newAdder(2);
         addTwo(2);
     )";
-    test_generic_expr<IntegerObj>(input, 4);
+    test_generic_expr<mlang::IntegerObj>(input, 4, mlang::ObjectType::INTEGER);
 }
 
 TEST(eval, StringObj)
@@ -291,7 +294,7 @@ TEST(eval, StringObj)
              {"\"parse\" + \" me\" + \" daddy\"", "parse me daddy"},
     })
     {
-        test_generic_expr<StringObj>(input, expected);
+        test_generic_expr<mlang::StringObj>(input, expected, mlang::ObjectType::STRING);
     }
 }
 
@@ -306,28 +309,28 @@ TEST(eval, BuiltInFns)
              {"first([1,2,3,4,5])", 1},
     })
     {
-        test_generic_expr<IntegerObj>(input, expected);
+        test_generic_expr<mlang::IntegerObj>(input, expected, mlang::ObjectType::INTEGER);
     }
 }
 
 TEST(eval, ArrayLiteral)
 {
     const std::string input = "[1, 2 * 2, 3 + 3]";
-    Parser p(std::make_unique<Lexer>(input));
+    mlang::Parser p(std::make_unique<mlang::Lexer>(input));
     auto program = p.parse_program();
     const auto& errors = p.get_errors();
     EXPECT_THAT(errors, IsEmpty()) << input;
     ASSERT_THAT(program, NotNull()) << input;
 
-    auto env = std::make_shared<Context>();
+    auto env = std::make_shared<mlang::Context>();
     auto res = eval(program.get(), env);
     ASSERT_THAT(res, NotNull()) << input;
-    ASSERT_EQ(typeid(*res), typeid(ArrayObj)) << res->inspect();
-    auto* obj = static_cast<ArrayObj*>(res.get());
+    ASSERT_EQ(res->get_type(), mlang::ObjectType::ARRAY) << res->inspect();
+    auto* obj = static_cast<mlang::ArrayObj*>(res.get());
     ASSERT_EQ(obj->m_values.size(), 3);
-    EXPECT_EQ(dynamic_cast<IntegerObj&>(*obj->m_values[0]).m_value, 1) << input;
-    EXPECT_EQ(dynamic_cast<IntegerObj&>(*obj->m_values[1]).m_value, 4) << input;
-    EXPECT_EQ(dynamic_cast<IntegerObj&>(*obj->m_values[2]).m_value, 6) << input;
+    EXPECT_EQ(dynamic_cast<mlang::IntegerObj&>(*obj->m_values[0]).m_value, 1) << input;
+    EXPECT_EQ(dynamic_cast<mlang::IntegerObj&>(*obj->m_values[1]).m_value, 4) << input;
+    EXPECT_EQ(dynamic_cast<mlang::IntegerObj&>(*obj->m_values[2]).m_value, 6) << input;
 }
 
 TEST(eval, HashLiteral)
@@ -343,17 +346,17 @@ TEST(eval, HashLiteral)
         false: 6
     };
     )";
-    Parser p(std::make_unique<Lexer>(input));
+    mlang::Parser p(std::make_unique<mlang::Lexer>(input));
     auto program = p.parse_program();
     const auto& errors = p.get_errors();
     EXPECT_THAT(errors, IsEmpty()) << input;
     ASSERT_THAT(program, NotNull()) << input;
 
-    auto env = std::make_shared<Context>();
+    auto env = std::make_shared<mlang::Context>();
     auto res = eval(program.get(), env);
     ASSERT_THAT(res, NotNull()) << input;
-    ASSERT_EQ(typeid(*res), typeid(HashObj)) << res->inspect();
-    auto* obj = static_cast<HashObj*>(res.get());
+    ASSERT_EQ(res->get_type(), mlang::ObjectType::HASH) << res->inspect();
+    auto* obj = static_cast<mlang::HashObj*>(res.get());
     ASSERT_EQ(obj->m_pairs.size(), 6);
 }
 
@@ -376,6 +379,6 @@ TEST(eval, IndexExpression)
              {"{5: 5}[5]",                                                      5}
     })
     {
-        test_generic_expr<IntegerObj>(input, expected);
+        test_generic_expr<mlang::IntegerObj>(input, expected, mlang::ObjectType::INTEGER);
     }
 }

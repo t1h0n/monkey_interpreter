@@ -1,23 +1,58 @@
 cmake_minimum_required(VERSION 3.10)
-project(monkey_compiler LANGUAGES CXX)
-
+project(
+  monkey_compiler
+  LANGUAGES CXX
+  VERSION 1.0)
 include(CheckIPOSupported)
 check_ipo_supported(RESULT supported OUTPUT output)
 if(supported)
-  message(STATUS "IPO / LTO enabled: ${INTERPROCEDURAL_OPTIMIZATION}")
+  message(STATUS "IPO / LTO enabled")
 else()
-  message(STATUS "IPO / LTO not supported: <${error}>")
+  message(STATUS "IPO / LTO not supported")
 endif()
 
 option(${PROJECT_NAME}_ENABLE_PARSE_TRACING
        "Specify if parsing tracing should be active" OFF)
+option(${PROJECT_NAME}_ENABLE_TESTING
+       "Specify if parsing testing should be ENABLED" OFF)
 
-find_package(fmt REQUIRED)
-find_package(GTest REQUIRED)
-find_package(magic_enum REQUIRED)
-find_package(range-v3 REQUIRED)
+include(FetchContent)
+FetchContent_Declare(
+  range-v3
+  GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
+  GIT_TAG master)
+FetchContent_MakeAvailable(range-v3)
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG master)
+FetchContent_MakeAvailable(fmt)
 
-add_subdirectory(dep/fs)
+FetchContent_Declare(
+  magic_enum
+  GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+  GIT_TAG master)
+FetchContent_MakeAvailable(magic_enum)
+
+if(${PROJECT_NAME}_ENABLE_TESTING)
+  set(gtest_force_shared_crt
+      ON
+      CACHE BOOL "" FORCE)
+  FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG main)
+  FetchContent_MakeAvailable(googletest)
+endif()
+FetchContent_Declare(
+  find_fs
+  GIT_REPOSITORY https://github.com/t1h0n/cpp_find_fs.git
+  GIT_TAG main)
+FetchContent_MakeAvailable(find_fs)
+
 add_subdirectory(lib)
 add_subdirectory(apps)
-add_subdirectory(test)
+
+if(${PROJECT_NAME}_ENABLE_TESTING)
+  add_subdirectory(test)
+endif()

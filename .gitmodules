@@ -1,3 +1,0 @@
-[submodule "dep/fs"]
-	path = dep/fs
-	url = https://github.com/t1h0n/cpp_find_fs.git

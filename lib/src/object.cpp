@@ -1,11 +1,13 @@
-#include "object.hpp"
+#include "mlang/object.hpp"
 
-#include "fmt/core.h"
-#include "fmt/ranges.h"
-#include "range/v3/view.hpp"
+#include <fmt/core.h>
+#include <fmt/ranges.h>
+#include <range/v3/view.hpp>
 
 namespace rv = ranges::views;
 
+namespace mlang
+{
 Object::~Object() = default;
 
 IntegerObj::IntegerObj(std::int64_t value)
@@ -195,3 +197,4 @@ void Context::set_obj(std::string_view name, const std::shared_ptr<Object>& obj)
 {
     m_objects[std::string(name)] = obj;
 }
+}  // namespace mlang

@@ -1,13 +1,14 @@
 #pragma once
-#include "token.hpp"
+#include "mlang/ilexer.hpp"
+#include "mlang/token.hpp"
 
-#include <unordered_map>
-
-class Lexer
+namespace mlang
+{
+class Lexer : public ILexer
 {
 public:
     Lexer(std::string_view input);
-    Token next_token();
+    Token next_token() override;
 
 private:
     auto read_identifier() -> std::string;
@@ -25,3 +26,4 @@ private:
     size_t m_read_pos;
     char m_ch;
 };
+}

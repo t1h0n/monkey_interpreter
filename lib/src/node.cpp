@@ -1,10 +1,13 @@
-#include "node.hpp"
+#include "mlang/node.hpp"
 
 #include "fmt/ranges.h"
-#include "range/v3/view.hpp"
+
+#include <range/v3/view.hpp>
 
 namespace rv = ranges::views;
 
+namespace mlang
+{
 Node::~Node() = default;
 Statement::~Statement() = default;
 Expression::~Expression() = default;
@@ -322,3 +325,4 @@ auto HashLiteral::token_literal() -> std::string
 {
     return m_token.literal;
 }
+}  // namespace mlang

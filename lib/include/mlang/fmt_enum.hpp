@@ -1,7 +1,6 @@
 #pragma once
-#include "fmt/core.h"
-#include "magic_enum.hpp"
-
+#include <fmt/core.h>
+#include <magic_enum.hpp>
 #include <stdexcept>
 #include <type_traits>
 
@@ -19,7 +18,7 @@ struct ::fmt::formatter<T, char, std::enable_if_t<std::is_enum_v<T>>>
     }
 
     template <typename FormatContext>
-    auto format(const T& enum_val, FormatContext& ctx)
+    auto format(const T& enum_val, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}", magic_enum::enum_name(enum_val));
     }

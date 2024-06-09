@@ -1,7 +1,8 @@
 #pragma once
 
-#include "node.hpp"
-#include "string_hash.hpp"
+#include "mlang/fmt_enum.hpp"
+#include "mlang/node.hpp"
+#include "mlang/string_hash.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -9,6 +10,8 @@
 #include <string_view>
 #include <unordered_map>
 
+namespace mlang
+{
 class Context;
 
 enum class ObjectType
@@ -211,3 +214,4 @@ private:
     ObjectsMap m_objects;
     std::shared_ptr<Context> m_parent_env;
 };
+}  // namespace mlang

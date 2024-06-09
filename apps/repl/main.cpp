@@ -1,7 +1,7 @@
-#include "repl.hpp"
+#include "mlang/repl.hpp"
 
 int main()
 {
-    Repl repl;
+    mlang::Repl repl;
     repl.interactive();
 }

@@ -1,14 +1,16 @@
-#include "exec.hpp"
+#include "mlang/exec.hpp"
 
-#include "eval.hpp"
-#include "fmt/core.h"
-#include "fmt/ranges.h"
-#include "fmt/std.h"
-#include "parser.hpp"
+#include "mlang/eval.hpp"
+#include "mlang/parser.hpp"
 
+#include <fmt/core.h>
+#include <fmt/ranges.h>
+#include <fmt/std.h>
 #include <fstream>
 
-namespace
+namespace mlang
+{
+namespace detail
 {
 auto read_file(const fs::path& file_path) -> std::string
 {
@@ -23,11 +25,11 @@ auto read_file(const fs::path& file_path) -> std::string
     file.read(out_buf.data(), f_size);
     return out_buf;
 }
-}  // namespace
+}  // namespace detail
 
 void exec(const fs::path& file_path)
 {
-    auto input = read_file(file_path);
+    auto input = detail::read_file(file_path);
 
     auto env = std::make_shared<Context>();
     Parser parser(std::make_unique<Lexer>(input));
@@ -40,3 +42,4 @@ void exec(const fs::path& file_path)
     }
     const auto evaluated = eval(program.get(), env);
 }
+}  // namespace mlang

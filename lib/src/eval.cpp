@@ -1,19 +1,67 @@
-#include "eval.hpp"
+#include "mlang/eval.hpp"
 
-#include "range/v3/view.hpp"
-
+#include <range/v3/view.hpp>
 #include <type_traits>
-#include <typeinfo>
 
 namespace rv = ::ranges::views;
 using namespace std::literals;
 
+namespace
+{
+template <typename Getter>
+auto eval_getter_pos(Getter&& callable, std::string_view name, const std::vector<std::shared_ptr<mlang::Object>>& args) -> std::shared_ptr<mlang::Object>
+{
+    if (std::size(args) != 1)
+    {
+        return std::make_shared<mlang::ErrorObj>(fmt::format("invalid number of parameters for {}, expected 1 got {}", name, std::size(args)));
+    }
+    auto& arg = *args[0];
+    const auto arg_type = arg.get_type();
+    if (arg_type == mlang::ObjectType::ARRAY)
+    {
+        auto& values = static_cast<mlang::ArrayObj&>(arg).m_values;
+        if (values.empty())
+        {
+            return mlang::detail::NIL;
+        }
+        return std::invoke(std::forward<Getter>(callable), values);
+    }
+    return std::make_shared<mlang::ErrorObj>(fmt::format("{} is not implemented for type {}", name, arg_type));
+}
+}  // namespace
+
+namespace mlang
+{
+namespace detail
+{
 const auto TRUE = std::make_shared<BooleanObj>(true);
 const auto FALSE = std::make_shared<BooleanObj>(false);
 const auto NIL = std::make_shared<NullObj>();
 
-namespace
-{
+const auto LEN = std::make_shared<BuiltInObj>(&eval_len);
+const auto REST = std::make_shared<BuiltInObj>(&eval_rest);
+const auto PUTS = std::make_shared<BuiltInObj>(&eval_puts);
+const auto PUSH = std::make_shared<BuiltInObj>(&eval_push);
+const auto ERASE = std::make_shared<BuiltInObj>(&eval_erase);
+const auto FIRST = std::make_shared<BuiltInObj>([](const std::vector<std::shared_ptr<Object>>& args)
+                                                { return eval_getter_pos([](const auto& cont)
+                                                                         { return cont.front(); },
+                                                                         "first"sv, args); });
+const auto LAST = std::make_shared<BuiltInObj>([](const std::vector<std::shared_ptr<Object>>& args)
+                                               { return eval_getter_pos([](const auto& cont)
+                                                                        { return cont.back(); },
+                                                                        "last"sv, args); });
+
+const auto BUILTINS = std::unordered_map<std::string_view, std::shared_ptr<Object>, string_hash, std::equal_to<>>{
+    std::make_pair("len"sv, LEN),
+    std::make_pair("first"sv, FIRST),
+    std::make_pair("last"sv, LAST),
+    std::make_pair("rest"sv, REST),
+    std::make_pair("push"sv, PUSH),
+    std::make_pair("puts"sv, PUTS),
+    std::make_pair("erase"sv, ERASE),
+};
+
 auto eval_len(const std::vector<std::shared_ptr<Object>>& args) -> std::shared_ptr<Object>
 {
     if (std::size(args) != 1)
@@ -43,27 +91,6 @@ auto eval_puts(const std::vector<std::shared_ptr<Object>>& args) -> std::shared_
         fmt::println("{}", obj->inspect());
     }
     return NIL;
-}
-
-template <typename Getter>
-auto eval_getter_pos(Getter&& callable, std::string_view name, const std::vector<std::shared_ptr<Object>>& args) -> std::shared_ptr<Object>
-{
-    if (std::size(args) != 1)
-    {
-        return std::make_shared<ErrorObj>(fmt::format("invalid number of parameters for {}, expected 1 got {}", name, std::size(args)));
-    }
-    auto& arg = *args[0];
-    const auto arg_type = arg.get_type();
-    if (arg_type == ObjectType::ARRAY)
-    {
-        auto& values = static_cast<ArrayObj&>(arg).m_values;
-        if (values.empty())
-        {
-            return NIL;
-        }
-        return std::invoke(std::forward<Getter>(callable), values);
-    }
-    return std::make_shared<ErrorObj>(fmt::format("{} is not implemented for type {}", name, arg_type));
 }
 
 auto eval_rest(const std::vector<std::shared_ptr<Object>>& args) -> std::shared_ptr<Object>
@@ -138,31 +165,7 @@ auto eval_erase(const std::vector<std::shared_ptr<Object>>& args) -> std::shared
     return std::make_shared<ErrorObj>(fmt::format("erase is not implemented for type {}", arg.get_type()));
 }
 
-const auto LEN = std::make_shared<BuiltInObj>(&eval_len);
-const auto REST = std::make_shared<BuiltInObj>(&eval_rest);
-const auto PUTS = std::make_shared<BuiltInObj>(&eval_puts);
-const auto PUSH = std::make_shared<BuiltInObj>(&eval_push);
-const auto ERASE = std::make_shared<BuiltInObj>(&eval_erase);
-const auto FIRST = std::make_shared<BuiltInObj>([](const std::vector<std::shared_ptr<Object>>& args)
-                                                { return eval_getter_pos([](const auto& cont)
-                                                                         { return cont.front(); },
-                                                                         "first"sv, args); });
-const auto LAST = std::make_shared<BuiltInObj>([](const std::vector<std::shared_ptr<Object>>& args)
-                                               { return eval_getter_pos([](const auto& cont)
-                                                                        { return cont.back(); },
-                                                                        "last"sv, args); });
-
-const auto BUILTINS = std::unordered_map<std::string_view, std::shared_ptr<Object>, string_hash, std::equal_to<>>{
-    std::make_pair("len"sv, LEN),
-    std::make_pair("first"sv, FIRST),
-    std::make_pair("last"sv, LAST),
-    std::make_pair("rest"sv, REST),
-    std::make_pair("push"sv, PUSH),
-    std::make_pair("puts"sv, PUTS),
-    std::make_pair("erase"sv, ERASE),
-};
-
-bool is_truth(const std::shared_ptr<Object>& obj)
+auto is_truth(const std::shared_ptr<Object>& obj) -> bool
 {
     return obj != FALSE && obj != NIL;
 }
@@ -432,7 +435,7 @@ auto eval_index_expression(const std::shared_ptr<Object>& obj, const std::shared
     }
     return std::make_shared<ErrorObj>(fmt::format("Index operator not supported for type {}", obj->get_type()));
 }
-}  // namespace
+}  // namespace detail
 
 auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Object>
 {
@@ -442,13 +445,13 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
     if (node_type == NodeType::Program)
     {
         auto* nd = static_cast<Program*>(node);
-        return eval_program(*nd, env);
+        return detail::eval_program(*nd, env);
     }
     else if (node_type == NodeType::PrefixExpression)
     {
         auto* nd = static_cast<PrefixExpression*>(node);
         auto right = eval(nd->m_right.get(), env);
-        return eval_prefix_expression(nd->m_operator, right);
+        return detail::eval_prefix_expression(nd->m_operator, right);
     }
     else if (node_type == NodeType::ExpressionStatement)
     {
@@ -458,12 +461,12 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
     else if (node_type == NodeType::BlockStatement)
     {
         auto* nd = static_cast<BlockStatement*>(node);
-        return eval_block_statement(*nd, env);
+        return detail::eval_block_statement(*nd, env);
     }
     else if (node_type == NodeType::IfExpression)
     {
         auto* nd = static_cast<IfExpression*>(node);
-        return eval_if_expression(*nd, env);
+        return detail::eval_if_expression(*nd, env);
     }
     else if (node_type == NodeType::IntegerLiteral)
     {
@@ -480,7 +483,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
     else if (node_type == NodeType::BooleanLiteral)
     {
         auto* nd = static_cast<BooleanLiteral*>(node);
-        return nd->m_value ? TRUE : FALSE;
+        return nd->m_value ? detail::TRUE : detail::FALSE;
     }
     else if (node_type == NodeType::InfixExpression)
     {
@@ -495,7 +498,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
         {
             return right;
         }
-        return eval_infix_expression(nd->m_operator, left, right);
+        return detail::eval_infix_expression(nd->m_operator, left, right);
     }
     else if (node_type == NodeType::ReturnStatement)
     {
@@ -506,7 +509,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
     else if (node_type == NodeType::Identifier)
     {
         auto* nd = static_cast<Identifier*>(node);
-        return eval_identifier(*nd, env);
+        return detail::eval_identifier(*nd, env);
     }
     else if (node_type == NodeType::LetStatement)
     {
@@ -517,7 +520,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
             return val;
         }
         env->set_obj(nd->m_name->m_value, val);
-        return NIL;
+        return detail::NIL;
     }
     else if (node_type == NodeType::FnLiteral)
     {
@@ -527,7 +530,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
     else if (node_type == NodeType::ArrayLiteral)
     {
         auto* nd = static_cast<ArrayLiteral*>(node);
-        auto elements = eval_expressions(nd->m_expressions, env);
+        auto elements = detail::eval_expressions(nd->m_expressions, env);
         if (elements.size() == 1 && elements.front()->get_type() == ObjectType::ERROR)
         {
             return std::move(elements.front());
@@ -543,7 +546,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
             return left;
         }
         auto index = eval(nd->m_index.get(), env);
-        return eval_index_expression(left, index);
+        return detail::eval_index_expression(left, index);
     }
     else if (node_type == NodeType::HashLiteral)
     {
@@ -573,7 +576,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
         {
             return condition;
         }
-        while (is_truth(condition))
+        while (detail::is_truth(condition))
         {
             auto body = eval(nd->m_loop_body.get(), env);
             if (body->get_type() == ObjectType::ERROR)
@@ -586,7 +589,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
                 return condition;
             }
         }
-        return NIL;
+        return detail::NIL;
     }
     else if (node_type == NodeType::CallExpression)
     {
@@ -596,7 +599,7 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
         {
             return func;
         }
-        auto args = eval_expressions(nd->m_arguments, env);
+        auto args = detail::eval_expressions(nd->m_arguments, env);
         if (args.size() == 1 && args.front()->get_type() == ObjectType::ERROR)
         {
             return std::move(args.front());
@@ -605,7 +608,8 @@ auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Ob
         {
             return static_cast<BuiltInObj&>(*func).m_value(args);
         }
-        return apply_function(std::static_pointer_cast<FunctionObj>(func), args);
+        return detail::apply_function(std::static_pointer_cast<FunctionObj>(func), args);
     }
     return nullptr;
 }
+}  // namespace mlang

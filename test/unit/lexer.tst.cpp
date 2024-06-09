@@ -1,81 +1,84 @@
-#include "lexer.hpp"
+#include "mlang/lexer.hpp"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <vector>
 
 using namespace ::testing;
 
-void validate_lexer(std::string_view input, std::vector<Token> expected_tokens)
+namespace
 {
-    Lexer lexer(input);
-    std::vector<Token> tokens;
-    for (auto token = lexer.next_token(); token.type != TokenType::EOFILE; token = lexer.next_token())
+
+void validate_lexer(std::string_view input, std::vector<mlang::Token> expected_tokens)
+{
+    mlang::Lexer lexer(input);
+    std::vector<mlang::Token> tokens;
+    for (auto token = lexer.next_token(); token.type != mlang::TokenType::EOFILE; token = lexer.next_token())
     {
         tokens.push_back(token);
     }
-    tokens.push_back({TokenType::EOFILE, ""});
+    tokens.push_back({mlang::TokenType::EOFILE, ""});
     EXPECT_THAT(tokens, ContainerEq(expected_tokens));
 }
+}  // namespace
 
 TEST(Lexer, Simple)
 {
     validate_lexer("=+(){},;", {
-                                   {TokenType::ASSIGN,    "="},
-                                   {TokenType::PLUS,      "+"},
-                                   {TokenType::LPAREN,    "("},
-                                   {TokenType::RPAREN,    ")"},
-                                   {TokenType::LBRACE,    "{"},
-                                   {TokenType::RBRACE,    "}"},
-                                   {TokenType::COMMA,     ","},
-                                   {TokenType::SEMICOLON, ";"},
-                                   {TokenType::EOFILE,    "" }
+                                   {mlang::TokenType::ASSIGN,    "="},
+                                   {mlang::TokenType::PLUS,      "+"},
+                                   {mlang::TokenType::LPAREN,    "("},
+                                   {mlang::TokenType::RPAREN,    ")"},
+                                   {mlang::TokenType::LBRACE,    "{"},
+                                   {mlang::TokenType::RBRACE,    "}"},
+                                   {mlang::TokenType::COMMA,     ","},
+                                   {mlang::TokenType::SEMICOLON, ";"},
+                                   {mlang::TokenType::EOFILE,    "" }
     });
 }
 
 TEST(Lexer, String)
 {
     validate_lexer("\"foobar\"", {
-                                     {TokenType::STRING, "foobar"},
-                                     {TokenType::EOFILE, ""      }
+                                     {mlang::TokenType::STRING, "foobar"},
+                                     {mlang::TokenType::EOFILE, ""      }
     });
 }
 
 TEST(Lexer, While)
 {
     validate_lexer("while(true){}", {
-                                        {TokenType::WHILE,  "while"},
-                                        {TokenType::LPAREN, "("    },
-                                        {TokenType::TRUE,   "true" },
-                                        {TokenType::RPAREN, ")"    },
-                                        {TokenType::LBRACE, "{"    },
-                                        {TokenType::RBRACE, "}"    },
-                                        {TokenType::EOFILE, ""     }
+                                        {mlang::TokenType::WHILE,  "while"},
+                                        {mlang::TokenType::LPAREN, "("    },
+                                        {mlang::TokenType::TRUE,   "true" },
+                                        {mlang::TokenType::RPAREN, ")"    },
+                                        {mlang::TokenType::LBRACE, "{"    },
+                                        {mlang::TokenType::RBRACE, "}"    },
+                                        {mlang::TokenType::EOFILE, ""     }
     });
 }
 
 TEST(Lexer, Array)
 {
     validate_lexer("[1, 2]", {
-                                 {TokenType::LBRACKET, "["},
-                                 {TokenType::INT,      "1"},
-                                 {TokenType::COMMA,    ","},
-                                 {TokenType::INT,      "2"},
-                                 {TokenType::RBRACKET, "]"},
-                                 {TokenType::EOFILE,   "" }
+                                 {mlang::TokenType::LBRACKET, "["},
+                                 {mlang::TokenType::INT,      "1"},
+                                 {mlang::TokenType::COMMA,    ","},
+                                 {mlang::TokenType::INT,      "2"},
+                                 {mlang::TokenType::RBRACKET, "]"},
+                                 {mlang::TokenType::EOFILE,   "" }
     });
 }
 
 TEST(Lexer, HashLiteral)
 {
     validate_lexer(R"({"foo" : "bar"})", {
-                                             {TokenType::LBRACE, "{"  },
-                                             {TokenType::STRING, "foo"},
-                                             {TokenType::COLON,  ":"  },
-                                             {TokenType::STRING, "bar"},
-                                             {TokenType::RBRACE, "}"  },
-                                             {TokenType::EOFILE, ""   }
+                                             {mlang::TokenType::LBRACE, "{"  },
+                                             {mlang::TokenType::STRING, "foo"},
+                                             {mlang::TokenType::COLON,  ":"  },
+                                             {mlang::TokenType::STRING, "bar"},
+                                             {mlang::TokenType::RBRACE, "}"  },
+                                             {mlang::TokenType::EOFILE, ""   }
     });
 }
 
@@ -96,67 +99,67 @@ return if else true false
 "foo bar"
 )",
                    {
-                       {TokenType::LET,       "let"    },
-                       {TokenType::IDENT,     "five"   },
-                       {TokenType::ASSIGN,    "="      },
-                       {TokenType::INT,       "5"      },
-                       {TokenType::SEMICOLON, ";"      },
-                       {TokenType::LET,       "let"    },
-                       {TokenType::IDENT,     "ten"    },
-                       {TokenType::ASSIGN,    "="      },
-                       {TokenType::INT,       "10"     },
-                       {TokenType::SEMICOLON, ";"      },
-                       {TokenType::LET,       "let"    },
-                       {TokenType::IDENT,     "add"    },
-                       {TokenType::ASSIGN,    "="      },
-                       {TokenType::FUNCTION,  "fn"     },
-                       {TokenType::LPAREN,    "("      },
-                       {TokenType::IDENT,     "x"      },
-                       {TokenType::COMMA,     ","      },
-                       {TokenType::IDENT,     "y"      },
-                       {TokenType::RPAREN,    ")"      },
-                       {TokenType::LBRACE,    "{"      },
-                       {TokenType::IDENT,     "x"      },
-                       {TokenType::PLUS,      "+"      },
-                       {TokenType::IDENT,     "y"      },
-                       {TokenType::SEMICOLON, ";"      },
-                       {TokenType::RBRACE,    "}"      },
-                       {TokenType::SEMICOLON, ";"      },
-                       {TokenType::LET,       "let"    },
-                       {TokenType::IDENT,     "result" },
-                       {TokenType::ASSIGN,    "="      },
-                       {TokenType::IDENT,     "add"    },
-                       {TokenType::LPAREN,    "("      },
-                       {TokenType::IDENT,     "five"   },
-                       {TokenType::COMMA,     ","      },
-                       {TokenType::IDENT,     "ten"    },
-                       {TokenType::RPAREN,    ")"      },
-                       {TokenType::SEMICOLON, ";"      },
-                       {TokenType::BANG,      "!"      },
-                       {TokenType::MINUS,     "-"      },
-                       {TokenType::SLASH,     "/"      },
-                       {TokenType::ASTERISK,  "*"      },
-                       {TokenType::INT,       "5"      },
-                       {TokenType::SEMICOLON, ";"      },
-                       {TokenType::INT,       "5"      },
-                       {TokenType::LT,        "<"      },
-                       {TokenType::INT,       "10"     },
-                       {TokenType::GT,        ">"      },
-                       {TokenType::INT,       "5"      },
-                       {TokenType::SEMICOLON, ";"      },
-                       {TokenType::RETURN,    "return" },
-                       {TokenType::IF,        "if"     },
-                       {TokenType::ELSE,      "else"   },
-                       {TokenType::TRUE,      "true"   },
-                       {TokenType::FALSE,     "false"  },
-                       {TokenType::INT,       "10"     },
-                       {TokenType::EQ,        "=="     },
-                       {TokenType::INT,       "10"     },
-                       {TokenType::INT,       "10"     },
-                       {TokenType::NOT_EQ,    "!="     },
-                       {TokenType::INT,       "9"      },
-                       {TokenType::STRING,    "foobar" },
-                       {TokenType::STRING,    "foo bar"},
-                       {TokenType::EOFILE,    ""       }
+                       {mlang::TokenType::LET,       "let"    },
+                       {mlang::TokenType::IDENT,     "five"   },
+                       {mlang::TokenType::ASSIGN,    "="      },
+                       {mlang::TokenType::INT,       "5"      },
+                       {mlang::TokenType::SEMICOLON, ";"      },
+                       {mlang::TokenType::LET,       "let"    },
+                       {mlang::TokenType::IDENT,     "ten"    },
+                       {mlang::TokenType::ASSIGN,    "="      },
+                       {mlang::TokenType::INT,       "10"     },
+                       {mlang::TokenType::SEMICOLON, ";"      },
+                       {mlang::TokenType::LET,       "let"    },
+                       {mlang::TokenType::IDENT,     "add"    },
+                       {mlang::TokenType::ASSIGN,    "="      },
+                       {mlang::TokenType::FUNCTION,  "fn"     },
+                       {mlang::TokenType::LPAREN,    "("      },
+                       {mlang::TokenType::IDENT,     "x"      },
+                       {mlang::TokenType::COMMA,     ","      },
+                       {mlang::TokenType::IDENT,     "y"      },
+                       {mlang::TokenType::RPAREN,    ")"      },
+                       {mlang::TokenType::LBRACE,    "{"      },
+                       {mlang::TokenType::IDENT,     "x"      },
+                       {mlang::TokenType::PLUS,      "+"      },
+                       {mlang::TokenType::IDENT,     "y"      },
+                       {mlang::TokenType::SEMICOLON, ";"      },
+                       {mlang::TokenType::RBRACE,    "}"      },
+                       {mlang::TokenType::SEMICOLON, ";"      },
+                       {mlang::TokenType::LET,       "let"    },
+                       {mlang::TokenType::IDENT,     "result" },
+                       {mlang::TokenType::ASSIGN,    "="      },
+                       {mlang::TokenType::IDENT,     "add"    },
+                       {mlang::TokenType::LPAREN,    "("      },
+                       {mlang::TokenType::IDENT,     "five"   },
+                       {mlang::TokenType::COMMA,     ","      },
+                       {mlang::TokenType::IDENT,     "ten"    },
+                       {mlang::TokenType::RPAREN,    ")"      },
+                       {mlang::TokenType::SEMICOLON, ";"      },
+                       {mlang::TokenType::BANG,      "!"      },
+                       {mlang::TokenType::MINUS,     "-"      },
+                       {mlang::TokenType::SLASH,     "/"      },
+                       {mlang::TokenType::ASTERISK,  "*"      },
+                       {mlang::TokenType::INT,       "5"      },
+                       {mlang::TokenType::SEMICOLON, ";"      },
+                       {mlang::TokenType::INT,       "5"      },
+                       {mlang::TokenType::LT,        "<"      },
+                       {mlang::TokenType::INT,       "10"     },
+                       {mlang::TokenType::GT,        ">"      },
+                       {mlang::TokenType::INT,       "5"      },
+                       {mlang::TokenType::SEMICOLON, ";"      },
+                       {mlang::TokenType::RETURN,    "return" },
+                       {mlang::TokenType::IF,        "if"     },
+                       {mlang::TokenType::ELSE,      "else"   },
+                       {mlang::TokenType::TRUE,      "true"   },
+                       {mlang::TokenType::FALSE,     "false"  },
+                       {mlang::TokenType::INT,       "10"     },
+                       {mlang::TokenType::EQ,        "=="     },
+                       {mlang::TokenType::INT,       "10"     },
+                       {mlang::TokenType::INT,       "10"     },
+                       {mlang::TokenType::NOT_EQ,    "!="     },
+                       {mlang::TokenType::INT,       "9"      },
+                       {mlang::TokenType::STRING,    "foobar" },
+                       {mlang::TokenType::STRING,    "foo bar"},
+                       {mlang::TokenType::EOFILE,    ""       }
     });
 }

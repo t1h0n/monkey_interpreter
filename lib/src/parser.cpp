@@ -1,7 +1,27 @@
-#include "parser.hpp"
+#include "mlang/parser.hpp"
+#include "mlang\raii_wrapper.hpp"
 
-#include "trace.hpp"
+#if defined(ENABLE_PARSE_TRACING)
+#define TRACE() const auto MACRO_trace_var_tmp_ = trace(__func__)
+#else
+#define TRACE() void(0)
+#endif
+namespace
+{
+inline auto trace(std::string_view s)
+{
+    static int counter = 0;
+    fmt::println("{}BEGIN {}", std::string(counter * 4, ' '), s);
+    ++counter;
+    return mlang::RaiiWrapper([s]()
+                              {
+                        --counter;
+                        fmt::println("{}END {}", std::string(counter * 4, ' '), s); });
+}
+}  // namespace
 
+namespace mlang
+{
 const std::unordered_map<TokenType, Precedence> Parser::PRECEDENCE_ORDER{
     {TokenType::EQ,       Precedence::EQUALS     },
     {TokenType::NOT_EQ,   Precedence::EQUALS     },
@@ -15,7 +35,7 @@ const std::unordered_map<TokenType, Precedence> Parser::PRECEDENCE_ORDER{
     {TokenType::LBRACKET, Precedence::INDEX      },
 };
 
-Parser::Parser(std::unique_ptr<Lexer>&& lexer)
+Parser::Parser(std::unique_ptr<ILexer>&& lexer)
     : m_lexer(std::move(lexer))
 {
     assert(m_lexer);
@@ -68,7 +88,7 @@ void Parser::peek_error(TokenType unwanted_token)
     m_errors.push_back(fmt::format("expected next token to be {}, got {} instead", unwanted_token, m_next));
 }
 
-auto Parser::get_errors() -> const std::vector<std::string>&
+auto Parser::get_errors() const -> const std::vector<std::string>&
 {
     return m_errors;
 }
@@ -268,8 +288,8 @@ auto Parser::parse_fn_parameters() -> std::vector<std::shared_ptr<Identifier>>
     ident->m_token = m_curr;
     ident->m_value = m_curr.literal;
 
-    std::vector<std::shared_ptr<Identifier>> idents;
-    idents.push_back(std::move(ident));
+    std::vector<std::shared_ptr<Identifier>> identifiers;
+    identifiers.push_back(std::move(ident));
 
     while (m_next.type == TokenType::COMMA)
     {
@@ -279,13 +299,13 @@ auto Parser::parse_fn_parameters() -> std::vector<std::shared_ptr<Identifier>>
         ident->m_token = m_curr;
         ident->m_value = m_curr.literal;
 
-        idents.push_back(std::move(ident));
+        identifiers.push_back(std::move(ident));
     }
     if (!expect_peek(TokenType::RPAREN))
     {
         return {};
     }
-    return idents;
+    return identifiers;
 }
 
 auto Parser::parse_string() -> std::unique_ptr<StringLiteral>
@@ -520,3 +540,4 @@ auto Parser::get_precedence(TokenType type) -> Precedence
     }
     return it->second;
 }
+}  // namespace mlang

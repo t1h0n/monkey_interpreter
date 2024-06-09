@@ -1,7 +1,9 @@
 #pragma once
-#include <cstdint>
 #include <functional>
+#include <string_view>
 
+namespace mlang
+{
 struct string_hash
 {
     using hash_type = std::hash<std::string_view>;
@@ -13,3 +15,4 @@ struct string_hash
 
     std::size_t operator()(std::string const& str) const { return hash_type{}(str); }
 };
+}  // namespace mlang

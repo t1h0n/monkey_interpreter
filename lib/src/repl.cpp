@@ -1,31 +1,15 @@
-#include "repl.hpp"
+#include "mlang/repl.hpp"
 
-#include "eval.hpp"
-#include "fmt/format.h"
-#include "fmt/ranges.h"
-#include "parser.hpp"
+#include "mlang/eval.hpp"
+#include "mlang/parser.hpp"
 
+#include <fmt/ranges.h>
 #include <iostream>
 
-namespace
+namespace mlang
 {
-const std::string MONKEY_FACE = R"(            __,__
-   .--.  .-"     "-.  .--.
-  / .. \/  .-. .-.  \/ .. \
- | |  '|  /   Y   \  |'  | |
- | \   \  \ 0 | 0 /  /   / |
-  \ '- ,\.-"""""""-./, -' /
-   ''-' /_   ^ ^   _\ '-''
-       |  \._   _./  |
-       \   \ '~' /   /
-        '._ '-=-' _.'
-           '-----'
-)";
-}  // namespace
-
 void Repl::interactive()
 {
-    fmt::println("{}", MONKEY_FACE);
     fmt::print(">> ");
     auto env = std::make_shared<Context>();
     std::string input;
@@ -43,7 +27,7 @@ void Repl::exec(std::string_view input, const std::shared_ptr<Context>& env)
     const auto& errors = parser.get_errors();
     if (!errors.empty() || !program)
     {
-        fmt::println("Woops! We ran into some monkey business here!");
+        fmt::println("Errors:");
         fmt::println("  parser errors:\n      {}", fmt::join(errors, "\n      "));
         return;
     }
@@ -53,3 +37,4 @@ void Repl::exec(std::string_view input, const std::shared_ptr<Context>& env)
         fmt::println("{}", evaluated->inspect());
     }
 }
+}  // namespace mlang

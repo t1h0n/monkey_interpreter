@@ -4,10 +4,10 @@
 
 namespace mlang
 {
-class Repl
+void repl_interactive();
+
+namespace detail
 {
-public:
-    void interactive();
-    void exec(std::string_view input, const std::shared_ptr<Context>& env);
-};
+void exec(std::string_view input, const std::shared_ptr<Context>& env);
+}
 }  // namespace mlang

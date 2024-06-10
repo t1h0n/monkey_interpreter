@@ -2,6 +2,5 @@
 
 int main()
 {
-    mlang::Repl repl;
-    repl.interactive();
+    mlang::repl_interactive();
 }

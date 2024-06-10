@@ -8,19 +8,21 @@
 
 namespace mlang
 {
-void Repl::interactive()
+void repl_interactive()
 {
     fmt::print(">> ");
     auto env = std::make_shared<Context>();
     std::string input;
     while (std::getline(std::cin, input))
     {
-        exec(input, env);
+        detail::exec(input, env);
         fmt::print(">> ");
     }
 }
 
-void Repl::exec(std::string_view input, const std::shared_ptr<Context>& env)
+namespace detail
+{
+void exec(std::string_view input, const std::shared_ptr<Context>& env)
 {
     Parser parser(std::make_unique<Lexer>(input));
     const auto program = parser.parse_program();
@@ -37,4 +39,5 @@ void Repl::exec(std::string_view input, const std::shared_ptr<Context>& env)
         fmt::println("{}", evaluated->inspect());
     }
 }
+}  // namespace detail
 }  // namespace mlang

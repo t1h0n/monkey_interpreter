@@ -1,4 +1,4 @@
-Implemenation of Monkey language described in "Writing A Compiler In Go" in C++ with some additions(while loop, additional intrinsics)
+Implemenation of Monkey language interpreter in C++ described in "Writing An Interpreter In Go" with some additional features (while loop, additional intrinsics)
 
 Executable targets:  
 monkey_compiler_unit_tests - tests, enabled by default and can be disabled  

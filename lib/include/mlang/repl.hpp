@@ -1,5 +1,4 @@
 #pragma once
-#include "mlang/lexer.hpp"
 #include "mlang/object.hpp"
 
 namespace mlang

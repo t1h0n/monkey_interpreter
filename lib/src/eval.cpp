@@ -52,7 +52,7 @@ const auto LAST = std::make_shared<BuiltInObj>([](const std::vector<std::shared_
                                                                         { return cont.back(); },
                                                                         "last"sv, args); });
 
-const auto BUILTINS = std::unordered_map<std::string_view, std::shared_ptr<Object>, string_hash, std::equal_to<>>{
+const auto BUILTINS = std::unordered_map<std::string_view, std::shared_ptr<Object>>{
     std::make_pair("len"sv, LEN),
     std::make_pair("first"sv, FIRST),
     std::make_pair("last"sv, LAST),

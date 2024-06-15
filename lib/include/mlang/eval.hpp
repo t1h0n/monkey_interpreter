@@ -16,7 +16,7 @@ extern const std::shared_ptr<BooleanObj> TRUE;
 extern const std::shared_ptr<BooleanObj> FALSE;
 extern const std::shared_ptr<NullObj> NIL;
 
-extern const std::unordered_map<std::string_view, std::shared_ptr<Object>, string_hash, std::equal_to<>> BUILTINS;
+extern const std::unordered_map<std::string_view, std::shared_ptr<Object>> BUILTINS;
 extern const std::shared_ptr<BuiltInObj> LEN;
 extern const std::shared_ptr<BuiltInObj> REST;
 extern const std::shared_ptr<BuiltInObj> PUTS;

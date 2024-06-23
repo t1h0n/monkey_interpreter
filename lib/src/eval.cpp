@@ -1,5 +1,6 @@
 #include "mlang/eval.hpp"
 
+#include <memory>
 #include <range/v3/view.hpp>
 #include <type_traits>
 
@@ -34,25 +35,25 @@ namespace mlang
 {
 namespace detail
 {
-const auto TRUE = std::make_shared<BooleanObj>(true);
-const auto FALSE = std::make_shared<BooleanObj>(false);
-const auto NIL = std::make_shared<NullObj>();
+const std::shared_ptr<BooleanObj> TRUE = std::make_shared<BooleanObj>(true);
+const std::shared_ptr<BooleanObj> FALSE = std::make_shared<BooleanObj>(false);
+const std::shared_ptr<NullObj> NIL = std::make_shared<NullObj>();
 
-const auto LEN = std::make_shared<BuiltInObj>(&eval_len);
-const auto REST = std::make_shared<BuiltInObj>(&eval_rest);
-const auto PUTS = std::make_shared<BuiltInObj>(&eval_puts);
-const auto PUSH = std::make_shared<BuiltInObj>(&eval_push);
-const auto ERASE = std::make_shared<BuiltInObj>(&eval_erase);
-const auto FIRST = std::make_shared<BuiltInObj>([](const std::vector<std::shared_ptr<Object>>& args)
-                                                { return eval_getter_pos([](const auto& cont)
-                                                                         { return cont.front(); },
-                                                                         "first"sv, args); });
-const auto LAST = std::make_shared<BuiltInObj>([](const std::vector<std::shared_ptr<Object>>& args)
-                                               { return eval_getter_pos([](const auto& cont)
-                                                                        { return cont.back(); },
-                                                                        "last"sv, args); });
+const std::shared_ptr<BuiltInObj> LEN = std::make_shared<BuiltInObj>(&eval_len);
+const std::shared_ptr<BuiltInObj> REST = std::make_shared<BuiltInObj>(&eval_rest);
+const std::shared_ptr<BuiltInObj> PUTS = std::make_shared<BuiltInObj>(&eval_puts);
+const std::shared_ptr<BuiltInObj> PUSH = std::make_shared<BuiltInObj>(&eval_push);
+const std::shared_ptr<BuiltInObj> ERASE = std::make_shared<BuiltInObj>(&eval_erase);
+const std::shared_ptr<BuiltInObj> FIRST = std::make_shared<BuiltInObj>([](const std::vector<std::shared_ptr<Object>>& args)
+                                                                       { return eval_getter_pos([](const auto& cont)
+                                                                                                { return cont.front(); },
+                                                                                                "first"sv, args); });
+const std::shared_ptr<BuiltInObj> LAST = std::make_shared<BuiltInObj>([](const std::vector<std::shared_ptr<Object>>& args)
+                                                                      { return eval_getter_pos([](const auto& cont)
+                                                                                               { return cont.back(); },
+                                                                                               "last"sv, args); });
 
-const auto BUILTINS = std::unordered_map<std::string_view, std::shared_ptr<Object>>{
+const std::unordered_map<std::string_view, std::shared_ptr<Object>> BUILTINS = {
     std::make_pair("len"sv, LEN),
     std::make_pair("first"sv, FIRST),
     std::make_pair("last"sv, LAST),

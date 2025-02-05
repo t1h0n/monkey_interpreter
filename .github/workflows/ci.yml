@@ -1,0 +1,68 @@
+name: CMake CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cmake-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install cmake-format 0.6.13
+        run: |
+          python3 -m pip install cmake-format==0.6.13
+
+      - name: Run cmake-format check
+        run: |
+          find . -path ./build -prune -o -type f \( -name "CMakeLists.txt" -o -name "*.cmake" \) -print -exec cmake-format --check {} +
+
+  clang-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install clang-format 19
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 19
+          sudo apt-get install -y clang-format-19
+
+      - name: Run clang-format check
+        run: |
+          find . -path ./build -prune -o -type f \( -name "*.h" -o -name "*.hpp" -o -name "*.cpp" \) -print -exec clang-format-19 --dry-run --Werror {} +
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: [cmake-format, clang-format]  # Ensure formatting checks run first
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+
+      - name: Create build directory
+        run: mkdir build
+
+      - name: Configure CMake
+        working-directory: ./build
+        run: cmake .. -Dmonkey_compiler_ENABLE_TESTING=ON
+
+      - name: Build project
+        working-directory: ./build
+        run: cmake --build . --config Release
+
+      - name: Run tests
+        working-directory: ./build
+        run: ./test/monkey_compiler_unit_tests

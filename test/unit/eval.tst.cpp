@@ -1,12 +1,10 @@
 
 
-#include "mlang/eval.hpp"
-
-#include "mlang/object.hpp"
-#include "mlang/parser.hpp"
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <mlang/eval.hpp>
+#include <mlang/object.hpp>
+#include <mlang/parser.hpp>
 
 using namespace ::testing;
 

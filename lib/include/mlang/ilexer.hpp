@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mlang/token.hpp"
+#include <mlang/token.hpp>
 
 namespace mlang
 {

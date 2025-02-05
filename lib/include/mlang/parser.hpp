@@ -1,10 +1,10 @@
 #pragma once
-#include "mlang/lexer.hpp"
-#include "mlang/node.hpp"
-#include "mlang/token.hpp"
 
 #include <functional>
 #include <memory>
+#include <mlang/lexer.hpp>
+#include <mlang/node.hpp>
+#include <mlang/token.hpp>
 #include <unordered_map>
 
 namespace mlang

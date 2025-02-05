@@ -1,8 +1,7 @@
 #pragma once
-#include "mlang/token.hpp"
-
 #include <cstdint>
 #include <memory>
+#include <mlang/token.hpp>
 #include <string>
 #include <vector>
 

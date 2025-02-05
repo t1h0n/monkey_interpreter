@@ -1,11 +1,9 @@
 
-#include "mlang/parser.hpp"
-
-#include "mlang/lexer.hpp"
-#include "mlang/node.hpp"
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <mlang/lexer.hpp>
+#include <mlang/node.hpp>
+#include <mlang/parser.hpp>
 #include <vector>
 
 #define UNUSED(expr) static_cast<void>((expr))

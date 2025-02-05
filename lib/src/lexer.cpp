@@ -1,6 +1,5 @@
-#include "mlang/lexer.hpp"
-
 #include <array>
+#include <mlang/lexer.hpp>
 
 using namespace std::literals;
 

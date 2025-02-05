@@ -1,4 +1,4 @@
-#include "mlang/repl.hpp"
+#include <mlang/repl.hpp>
 
 int main()
 {

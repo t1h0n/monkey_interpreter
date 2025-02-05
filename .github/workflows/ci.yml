@@ -38,7 +38,7 @@ jobs:
 
       - name: Run clang-format check
         run: |
-          find apps lib test -path ./build -prune -o -type f \( -name "*.h" -o -name "*.hpp" -o -name "*.cpp" \) -print -exec clang-format-19 --dry-run --Werror {} +
+          find . -path ./build -prune -o -type f \( -name "*.h" -o -name "*.hpp" -o -name "*.cpp" \) -print -exec clang-format-19 --dry-run --Werror {} +
 
   build-and-test:
     runs-on: ubuntu-latest

@@ -18,18 +18,18 @@ include(FetchContent)
 FetchContent_Declare(
     range-v3
     GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
-    GIT_TAG master)
+    GIT_TAG 0.12.0)
 FetchContent_MakeAvailable(range-v3)
 FetchContent_Declare(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG master)
+    GIT_TAG 11.1.3)
 FetchContent_MakeAvailable(fmt)
 
 FetchContent_Declare(
     magic_enum
     GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-    GIT_TAG master)
+    GIT_TAG v0.9.7)
 FetchContent_MakeAvailable(magic_enum)
 
 if(${PROJECT_NAME}_ENABLE_TESTING)
@@ -39,7 +39,7 @@ if(${PROJECT_NAME}_ENABLE_TESTING)
     FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG main)
+        GIT_TAG v1.15.2)
     FetchContent_MakeAvailable(googletest)
 endif()
 FetchContent_Declare(

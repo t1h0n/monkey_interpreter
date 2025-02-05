@@ -1,6 +1,6 @@
 #pragma once
 #include <fmt/core.h>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <stdexcept>
 #include <type_traits>
 

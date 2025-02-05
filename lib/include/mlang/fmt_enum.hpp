@@ -5,7 +5,7 @@
 #include <type_traits>
 
 template <typename T>
-struct ::fmt::formatter<T, char, std::enable_if_t<std::is_enum_v<T>>>
+struct fmt::formatter<T, char, std::enable_if_t<std::is_enum_v<T>>>
 {
     constexpr auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {

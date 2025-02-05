@@ -68,7 +68,7 @@ inline bool operator!=(const Token& lhs, const Token& rhs)
 }  // namespace mlang
 
 template <>
-struct ::fmt::formatter<::mlang::Token>
+struct fmt::formatter<::mlang::Token>
 {
     constexpr auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {

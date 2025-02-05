@@ -5,7 +5,6 @@
 
 #include <memory>
 
-
 namespace mlang
 {
 auto eval(Node* node, const std::shared_ptr<Context>& env) -> std::shared_ptr<Object>;

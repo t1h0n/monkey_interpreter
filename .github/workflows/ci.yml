@@ -15,12 +15,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install clang-format
-        run: sudo apt-get install -y clang-format
+      - name: Install clang-format 19
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 19
+          sudo apt-get install -y clang-format-19
 
       - name: Run clang-format check
         run: |
-          find apps lib test -type f \( -name "*.hpp" -o -name "*.cpp" \) -exec clang-format --dry-run --Werror {} +
+          find apps lib test -type f \( -name "*.hpp" -o -name "*.cpp" \) -exec clang-format-19 --dry-run --Werror {} +
 
   build-and-test:
     runs-on: ubuntu-latest

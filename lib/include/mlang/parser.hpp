@@ -7,7 +7,6 @@
 #include <mlang/token.hpp>
 #include <unordered_map>
 
-
 namespace mlang
 {
 enum class Precedence : std::uint8_t

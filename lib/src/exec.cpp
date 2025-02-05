@@ -1,12 +1,11 @@
-#include "mlang/exec.hpp"
-
-#include "mlang/eval.hpp"
-#include "mlang/parser.hpp"
-
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 #include <fmt/std.h>
 #include <fstream>
+#include <mlang/eval.hpp>
+#include <mlang/exec.hpp>
+#include <mlang/parser.hpp>
+#include <string>
 
 namespace mlang
 {
@@ -20,7 +19,7 @@ auto read_file(const fs::path& file_path) -> std::string
         return {};
     }
     const auto f_size = fs::file_size(file_path);
-    std::string out_buf(f_size, 0);
+    std::string out_buf(static_cast<std::string::size_type>(f_size), 0);
     std::ifstream file(file_path.c_str(), std::ios::binary);
     file.read(out_buf.data(), f_size);
     return out_buf;

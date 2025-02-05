@@ -1,5 +1,5 @@
 #pragma once
-#include "mlang/object.hpp"
+#include <mlang/object.hpp>
 
 namespace mlang
 {

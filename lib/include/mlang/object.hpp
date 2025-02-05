@@ -1,11 +1,10 @@
 #pragma once
 
-#include "mlang/fmt_enum.hpp"
-#include "mlang/node.hpp"
-#include "mlang/string_hash.hpp"
-
 #include <cstdint>
 #include <memory>
+#include <mlang/fmt_enum.hpp>
+#include <mlang/node.hpp>
+#include <mlang/string_hash.hpp>
 #include <string>
 #include <string_view>
 #include <unordered_map>

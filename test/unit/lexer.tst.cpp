@@ -1,7 +1,6 @@
-#include "mlang/lexer.hpp"
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <mlang/lexer.hpp>
 #include <vector>
 
 using namespace ::testing;

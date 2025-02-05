@@ -1,7 +1,5 @@
-#include "mlang/parser.hpp"
-
-#include "mlang\raii_wrapper.hpp"
-
+#include <mlang/parser.hpp>
+#include <mlang/raii_wrapper.hpp>
 #include <utility>
 
 #if defined(ENABLE_PARSE_TRACING)
@@ -11,7 +9,7 @@ namespace
 {
 inline auto trace(std::string_view s)
 {
-    static int counter = 0;
+    static std::int32_t counter = 0;
     fmt::println("{}BEGIN {}", std::string(counter * 4, ' '), s);
     ++counter;
     return mlang::RaiiWrapper([s]()

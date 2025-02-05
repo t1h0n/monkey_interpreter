@@ -1,7 +1,6 @@
-#include "mlang/object.hpp"
-
 #include <fmt/core.h>
 #include <fmt/ranges.h>
+#include <mlang/object.hpp>
 #include <range/v3/view.hpp>
 
 namespace rv = ranges::views;

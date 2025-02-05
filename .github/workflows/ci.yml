@@ -9,6 +9,20 @@ on:
       - main
 
 jobs:
+  cmake-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install cmake-format
+        run: |
+          python3 -m pip install cmake-format
+
+      - name: Run cmake-format check
+        run: |
+          find . -path ./build -prune -o -type f \( -name "CMakeLists.txt" -o -name "*.cmake" \) -exec cmake-format --check {} +
+
   clang-format:
     runs-on: ubuntu-latest
     steps:
@@ -24,11 +38,11 @@ jobs:
 
       - name: Run clang-format check
         run: |
-          find apps lib test -type f \( -name "*.hpp" -o -name "*.cpp" \) -exec clang-format-19 --dry-run --Werror {} +
+          find . -path ./build -prune -o -type f \( -name "*.h" -o -name "*.cpp" \) -exec clang-format-19 --dry-run --Werror {} +
 
   build-and-test:
     runs-on: ubuntu-latest
-    needs: clang-format  # Ensure clang-format runs first
+    needs: [cmake-format, clang-format]  # Ensure formatting checks run first
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

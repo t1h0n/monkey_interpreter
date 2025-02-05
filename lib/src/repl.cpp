@@ -1,10 +1,8 @@
-#include "mlang/repl.hpp"
-
-#include "mlang/eval.hpp"
-#include "mlang/parser.hpp"
-
 #include <fmt/ranges.h>
 #include <iostream>
+#include <mlang/eval.hpp>
+#include <mlang/parser.hpp>
+#include <mlang/repl.hpp>
 
 namespace mlang
 {

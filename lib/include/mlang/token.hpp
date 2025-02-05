@@ -1,9 +1,8 @@
 #pragma once
 
-#include "mlang/fmt_enum.hpp"
-
 #include <cstdint>
 #include <fmt/core.h>
+#include <mlang/fmt_enum.hpp>
 #include <stdexcept>
 #include <string>
 

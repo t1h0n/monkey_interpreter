@@ -1,3 +1,4 @@
+#include <charconv>
 #include <mlang/parser.hpp>
 #include <mlang/raii_wrapper.hpp>
 #include <utility>
@@ -243,13 +244,11 @@ auto Parser::parse_int() -> std::unique_ptr<IntegerLiteral>
     TRACE();
     auto expr = std::make_unique<IntegerLiteral>();
     expr->m_token = m_curr;
-    try
+
+    auto [ptr, ec] = std::from_chars(m_curr.literal.data(), m_curr.literal.data() + m_curr.literal.size(), expr->m_value);
+    if (ec != std::errc())
     {
-        expr->m_value = std::stoll(m_curr.literal);
-    }
-    catch (const std::exception& e)
-    {
-        fmt::println("failed to parse integer {}", e.what());
+        m_errors.push_back(fmt::format("failed to parse integer {} {}", m_curr.literal, ec));
         return nullptr;
     }
     return expr;

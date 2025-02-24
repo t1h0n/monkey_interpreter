@@ -6,9 +6,10 @@ project(
 include(CheckIPOSupported)
 check_ipo_supported(RESULT supported OUTPUT output)
 if(supported)
-    message(STATUS "IPO / LTO enabled")
+    message(STATUS "IPO / LTO enabled for Release and RelWithDebInfo builds")
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:TRUE>)
 else()
-    message(STATUS "IPO / LTO not supported")
+    message(STATUS "IPO / LTO not supported: ${output}")
 endif()
 
 option(${PROJECT_NAME}_ENABLE_PARSE_TRACING "Specify if parsing tracing should be active" OFF)
